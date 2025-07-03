@@ -1,17 +1,36 @@
--- create database student_manager;
+-- Ensure UTF-8 support
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+SET CHARACTER SET utf8mb4;
+SET character_set_connection = utf8mb4;
+SET character_set_database = utf8mb4;
+SET character_set_results = utf8mb4;
+SET character_set_server = utf8mb4;
+SET collation_connection = utf8mb4_unicode_ci;
+SET collation_database = utf8mb4_unicode_ci;
+SET collation_server = utf8mb4_unicode_ci;
+
+-- Create database with proper charset
+CREATE DATABASE IF NOT EXISTS student_manager 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+USE student_manager;
+
+-- Set default charset for the database
+ALTER DATABASE student_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Create students table
 CREATE TABLE students (
     student_id VARCHAR(10) PRIMARY KEY,
     student_name VARCHAR(100) NOT NULL,
     birth_year INTEGER NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create subjects table
 CREATE TABLE subjects (
     subject_id VARCHAR(10) PRIMARY KEY,
     subject_name VARCHAR(100) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create grades table
 CREATE TABLE grades (
@@ -22,7 +41,7 @@ CREATE TABLE grades (
     FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE,
     UNIQUE (student_id, subject_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create indexes for better performance
 CREATE INDEX idx_students_name ON students(student_name);
