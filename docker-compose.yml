@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  backend:
+    build: ./student-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - student-net
+  frontend:
+    build: ./student-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - student-net
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: student_manager
+      MYSQL_ROOT_PASSWORD: baby
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - student-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db_data:
+networks:
+  student-net:
+    driver: bridge
