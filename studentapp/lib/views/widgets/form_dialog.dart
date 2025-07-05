@@ -72,9 +72,15 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
   @override
   void initState() {
     super.initState();
-    _studentIdController = TextEditingController(text: widget.initialStudentId ?? '');
-    _studentNameController = TextEditingController(text: widget.initialStudentName ?? '');
-    _birthYearController = TextEditingController(text: widget.initialBirthYear?.toString() ?? '');
+    _studentIdController = TextEditingController(
+      text: widget.initialStudentId ?? '',
+    );
+    _studentNameController = TextEditingController(
+      text: widget.initialStudentName ?? '',
+    );
+    _birthYearController = TextEditingController(
+      text: widget.initialBirthYear?.toString() ?? '',
+    );
   }
 
   @override
@@ -188,8 +194,12 @@ class _SubjectFormDialogState extends State<SubjectFormDialog> {
   @override
   void initState() {
     super.initState();
-    _subjectIdController = TextEditingController(text: widget.initialSubjectId ?? '');
-    _subjectNameController = TextEditingController(text: widget.initialSubjectName ?? '');
+    _subjectIdController = TextEditingController(
+      text: widget.initialSubjectId ?? '',
+    );
+    _subjectNameController = TextEditingController(
+      text: widget.initialSubjectName ?? '',
+    );
   }
 
   @override

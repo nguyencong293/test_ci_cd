@@ -10,7 +10,7 @@ class Validators {
     }
 
     final trimmed = value.trim();
-    
+
     if (trimmed.length < 3) {
       return '$fieldName phải có ít nhất 3 ký tự';
     }
@@ -27,13 +27,18 @@ class Validators {
   }
 
   /// Generic validator for name fields
-  static String? _validateName(String? value, String fieldName, {int minLength = 2, int maxLength = 100}) {
+  static String? _validateName(
+    String? value,
+    String fieldName, {
+    int minLength = 2,
+    int maxLength = 100,
+  }) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName không được để trống';
     }
 
     final trimmed = value.trim();
-    
+
     if (trimmed.length < minLength) {
       return '$fieldName phải có ít nhất $minLength ký tự';
     }
