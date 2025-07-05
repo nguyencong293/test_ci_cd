@@ -37,8 +37,13 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   void _showAddSubjectDialog() {
     showDialog(
       context: context,
-      builder: (context) => _AddSubjectDialog(
-        onAdd: (subject) async {
+      builder: (context) => widgets.SubjectFormDialog(
+        title: 'Thêm môn học',
+        onSubmit: (subjectId, subjectName) async {
+          final subject = Subject(
+            subjectId: subjectId,
+            subjectName: subjectName,
+          );
           final success = await _subjectController.createSubject(subject);
           if (success) {
             Navigator.of(context).pop();
@@ -58,9 +63,16 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   void _showEditSubjectDialog(Subject subject) {
     showDialog(
       context: context,
-      builder: (context) => _EditSubjectDialog(
-        subject: subject,
-        onEdit: (updatedSubject) async {
+      builder: (context) => widgets.SubjectFormDialog(
+        title: 'Sửa môn học',
+        initialSubjectId: subject.subjectId,
+        initialSubjectName: subject.subjectName,
+        readOnlyId: true,
+        onSubmit: (subjectId, subjectName) async {
+          final updatedSubject = Subject(
+            subjectId: subjectId,
+            subjectName: subjectName,
+          );
           final success = await _subjectController.updateSubject(
             subject.subjectId,
             updatedSubject,
@@ -187,162 +199,6 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Dialog for adding new subject
-class _AddSubjectDialog extends StatefulWidget {
-  final Function(Subject) onAdd;
-
-  const _AddSubjectDialog({required this.onAdd});
-
-  @override
-  State<_AddSubjectDialog> createState() => _AddSubjectDialogState();
-}
-
-class _AddSubjectDialogState extends State<_AddSubjectDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _subjectIdController = TextEditingController();
-  final _subjectNameController = TextEditingController();
-
-  @override
-  void dispose() {
-    _subjectIdController.dispose();
-    _subjectNameController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final subject = Subject(
-        subjectId: _subjectIdController.text.trim(),
-        subjectName: _subjectNameController.text.trim(),
-      );
-      widget.onAdd(subject);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Thêm môn học'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _subjectIdController,
-              decoration: const InputDecoration(
-                labelText: 'Mã môn học',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateSubjectId,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _subjectNameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên môn học',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateSubjectName,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
-        ),
-        ElevatedButton(onPressed: _submit, child: const Text('Thêm')),
-      ],
-    );
-  }
-}
-
-/// Dialog for editing subject
-class _EditSubjectDialog extends StatefulWidget {
-  final Subject subject;
-  final Function(Subject) onEdit;
-
-  const _EditSubjectDialog({required this.subject, required this.onEdit});
-
-  @override
-  State<_EditSubjectDialog> createState() => _EditSubjectDialogState();
-}
-
-class _EditSubjectDialogState extends State<_EditSubjectDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _subjectIdController;
-  late final TextEditingController _subjectNameController;
-
-  @override
-  void initState() {
-    super.initState();
-    _subjectIdController = TextEditingController(
-      text: widget.subject.subjectId,
-    );
-    _subjectNameController = TextEditingController(
-      text: widget.subject.subjectName,
-    );
-  }
-
-  @override
-  void dispose() {
-    _subjectIdController.dispose();
-    _subjectNameController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final subject = Subject(
-        subjectId: _subjectIdController.text.trim(),
-        subjectName: _subjectNameController.text.trim(),
-      );
-      widget.onEdit(subject);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Sửa môn học'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _subjectIdController,
-              decoration: const InputDecoration(
-                labelText: 'Mã môn học',
-                border: OutlineInputBorder(),
-              ),
-              enabled: false, // Don't allow editing subject ID
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _subjectNameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên môn học',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateSubjectName,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
-        ),
-        ElevatedButton(onPressed: _submit, child: const Text('Cập nhật')),
-      ],
     );
   }
 }

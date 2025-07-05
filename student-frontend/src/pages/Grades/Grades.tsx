@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useGrades, useStudents, useSubjects } from "../../hooks";
+import { EnhancedApiService } from "../../services/enhanced-api";
 import type { Grade, GradeDetail } from "../../types";
 import Table from "../../components/Table/Table";
 import Button from "../../components/Button/Button";
@@ -71,15 +72,11 @@ const GradesPage: React.FC = () => {
   };
 
   // Enrich grades with student and subject names
-  const gradesWithDetails: GradeDetail[] = grades.map((grade) => {
-    const student = students.find((s) => s.studentId === grade.studentId);
-    const subject = subjects.find((s) => s.subjectId === grade.subjectId);
-    return {
-      ...grade,
-      studentName: student?.studentName,
-      subjectName: subject?.subjectName,
-    };
-  });
+  const gradesWithDetails: GradeDetail[] = EnhancedApiService.enrichGradesWithDetails(
+    grades, 
+    students, 
+    subjects
+  );
 
   const filteredGrades = gradesWithDetails.filter((grade) => {
     const studentName = grade.studentName || "";

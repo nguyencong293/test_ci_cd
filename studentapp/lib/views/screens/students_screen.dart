@@ -37,8 +37,14 @@ class _StudentsScreenState extends State<StudentsScreen> {
   void _showAddStudentDialog() {
     showDialog(
       context: context,
-      builder: (context) => _AddStudentDialog(
-        onAdd: (student) async {
+      builder: (context) => widgets.StudentFormDialog(
+        title: 'Thêm sinh viên',
+        onSubmit: (studentId, studentName, birthYear) async {
+          final student = Student(
+            studentId: studentId,
+            studentName: studentName,
+            birthYear: birthYear,
+          );
           final success = await _studentController.createStudent(student);
           if (success) {
             Navigator.of(context).pop();
@@ -58,9 +64,18 @@ class _StudentsScreenState extends State<StudentsScreen> {
   void _showEditStudentDialog(Student student) {
     showDialog(
       context: context,
-      builder: (context) => _EditStudentDialog(
-        student: student,
-        onEdit: (updatedStudent) async {
+      builder: (context) => widgets.StudentFormDialog(
+        title: 'Sửa sinh viên',
+        initialStudentId: student.studentId,
+        initialStudentName: student.studentName,
+        initialBirthYear: student.birthYear,
+        readOnlyId: true,
+        onSubmit: (studentId, studentName, birthYear) async {
+          final updatedStudent = Student(
+            studentId: studentId,
+            studentName: studentName,
+            birthYear: birthYear,
+          );
           final success = await _studentController.updateStudent(
             student.studentId,
             updatedStudent,
@@ -187,191 +202,6 @@ class _StudentsScreenState extends State<StudentsScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Dialog for adding new student
-class _AddStudentDialog extends StatefulWidget {
-  final Function(Student) onAdd;
-
-  const _AddStudentDialog({required this.onAdd});
-
-  @override
-  State<_AddStudentDialog> createState() => _AddStudentDialogState();
-}
-
-class _AddStudentDialogState extends State<_AddStudentDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _studentIdController = TextEditingController();
-  final _studentNameController = TextEditingController();
-  final _birthYearController = TextEditingController();
-
-  @override
-  void dispose() {
-    _studentIdController.dispose();
-    _studentNameController.dispose();
-    _birthYearController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final student = Student(
-        studentId: _studentIdController.text.trim(),
-        studentName: _studentNameController.text.trim(),
-        birthYear: int.parse(_birthYearController.text.trim()),
-      );
-      widget.onAdd(student);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Thêm sinh viên'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _studentIdController,
-              decoration: const InputDecoration(
-                labelText: 'Mã sinh viên',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateStudentId,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _studentNameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên sinh viên',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateStudentName,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _birthYearController,
-              decoration: const InputDecoration(
-                labelText: 'Năm sinh',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              validator: Validators.validateBirthYear,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
-        ),
-        ElevatedButton(onPressed: _submit, child: const Text('Thêm')),
-      ],
-    );
-  }
-}
-
-/// Dialog for editing student
-class _EditStudentDialog extends StatefulWidget {
-  final Student student;
-  final Function(Student) onEdit;
-
-  const _EditStudentDialog({required this.student, required this.onEdit});
-
-  @override
-  State<_EditStudentDialog> createState() => _EditStudentDialogState();
-}
-
-class _EditStudentDialogState extends State<_EditStudentDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _studentIdController;
-  late final TextEditingController _studentNameController;
-  late final TextEditingController _birthYearController;
-
-  @override
-  void initState() {
-    super.initState();
-    _studentIdController = TextEditingController(
-      text: widget.student.studentId,
-    );
-    _studentNameController = TextEditingController(
-      text: widget.student.studentName,
-    );
-    _birthYearController = TextEditingController(
-      text: widget.student.birthYear.toString(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _studentIdController.dispose();
-    _studentNameController.dispose();
-    _birthYearController.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final student = Student(
-        studentId: _studentIdController.text.trim(),
-        studentName: _studentNameController.text.trim(),
-        birthYear: int.parse(_birthYearController.text.trim()),
-      );
-      widget.onEdit(student);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Sửa sinh viên'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _studentIdController,
-              decoration: const InputDecoration(
-                labelText: 'Mã sinh viên',
-                border: OutlineInputBorder(),
-              ),
-              enabled: false, // Don't allow editing student ID
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _studentNameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên sinh viên',
-                border: OutlineInputBorder(),
-              ),
-              validator: Validators.validateStudentName,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _birthYearController,
-              decoration: const InputDecoration(
-                labelText: 'Năm sinh',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              validator: Validators.validateBirthYear,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Hủy'),
-        ),
-        ElevatedButton(onPressed: _submit, child: const Text('Cập nhật')),
-      ],
     );
   }
 }

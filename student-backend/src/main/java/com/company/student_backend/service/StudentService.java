@@ -2,7 +2,6 @@ package com.company.student_backend.service;
 
 import com.company.student_backend.dto.StudentDTO;
 import com.company.student_backend.exception.DuplicateResourceException;
-import com.company.student_backend.exception.ResourceNotFoundException;
 import com.company.student_backend.model.Student;
 import com.company.student_backend.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final ValidationService validationService;
 
     public List<StudentDTO> getAllStudents() {
         log.debug("Fetching all students");
@@ -30,8 +30,7 @@ public class StudentService {
 
     public StudentDTO getStudentById(String studentId) {
         log.debug("Fetching student with ID: {}", studentId);
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy học sinh với mã: " + studentId));
+        Student student = validationService.validateAndGetStudent(studentId);
         return convertToDTO(student);
     }
 
@@ -52,8 +51,7 @@ public class StudentService {
     public StudentDTO updateStudent(String studentId, StudentDTO studentDTO) {
         log.debug("Updating student with ID: {}", studentId);
 
-        Student existingStudent = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy học sinh với mã: " + studentId));
+        Student existingStudent = validationService.validateAndGetStudent(studentId);
 
         existingStudent.setStudentName(studentDTO.getStudentName());
         existingStudent.setBirthYear(studentDTO.getBirthYear());
@@ -67,8 +65,8 @@ public class StudentService {
     public void deleteStudent(String studentId) {
         log.debug("Deleting student with ID: {}", studentId);
 
-        if (!studentRepository.existsById(studentId)) {
-            throw new ResourceNotFoundException("Không tìm thấy học sinh với mã: " + studentId);
+        if (!validationService.isStudentExists(studentId)) {
+            validationService.validateAndGetStudent(studentId); // Throws ResourceNotFoundException
         }
 
         studentRepository.deleteById(studentId);

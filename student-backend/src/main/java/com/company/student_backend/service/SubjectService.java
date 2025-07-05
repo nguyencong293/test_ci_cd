@@ -2,7 +2,6 @@ package com.company.student_backend.service;
 
 import com.company.student_backend.dto.SubjectDTO;
 import com.company.student_backend.exception.DuplicateResourceException;
-import com.company.student_backend.exception.ResourceNotFoundException;
 import com.company.student_backend.model.Subject;
 import com.company.student_backend.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
+    private final ValidationService validationService;
 
     public List<SubjectDTO> getAllSubjects() {
         log.debug("Fetching all subjects");
@@ -30,8 +30,7 @@ public class SubjectService {
 
     public SubjectDTO getSubjectById(String subjectId) {
         log.debug("Fetching subject with ID: {}", subjectId);
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy môn học với mã: " + subjectId));
+        Subject subject = validationService.validateAndGetSubject(subjectId);
         return convertToDTO(subject);
     }
 
@@ -52,8 +51,7 @@ public class SubjectService {
     public SubjectDTO updateSubject(String subjectId, SubjectDTO subjectDTO) {
         log.debug("Updating subject with ID: {}", subjectId);
 
-        Subject existingSubject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy môn học với mã: " + subjectId));
+        Subject existingSubject = validationService.validateAndGetSubject(subjectId);
 
         existingSubject.setSubjectName(subjectDTO.getSubjectName());
 
@@ -66,8 +64,8 @@ public class SubjectService {
     public void deleteSubject(String subjectId) {
         log.debug("Deleting subject with ID: {}", subjectId);
 
-        if (!subjectRepository.existsById(subjectId)) {
-            throw new ResourceNotFoundException("Không tìm thấy môn học với mã: " + subjectId);
+        if (!validationService.isSubjectExists(subjectId)) {
+            validationService.validateAndGetSubject(subjectId); // Throws ResourceNotFoundException
         }
 
         subjectRepository.deleteById(subjectId);

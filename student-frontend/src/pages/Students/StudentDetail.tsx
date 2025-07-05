@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { studentApi, gradeApi } from "../../services/api";
+import { studentApi } from "../../services/api";
+import { EnhancedApiService } from "../../services/enhanced-api";
 import type { Student, GradeDetail } from "../../types";
 import { calculateAge, formatScore, getScoreColor } from "../../utils";
 import Button from "../../components/Button/Button";
@@ -23,40 +24,18 @@ const StudentDetailPage: React.FC = () => {
 
       setLoading(true);
       try {
-        const [studentRes, gradesRes] = await Promise.all([
+        const [studentRes, gradesWithSubjects] = await Promise.all([
           studentApi.getStudentById(id),
-          gradeApi.getGradesByStudentId(id),
+          EnhancedApiService.getStudentGradesWithSubjects(id),
         ]);
 
         setStudent(studentRes.data);
-
-        // Fetch subject names for each grade
-        const gradesWithSubjects = await Promise.all(
-          gradesRes.data.map(async (grade) => {
-            try {
-              const subjectRes = await fetch(
-                `http://localhost:8080/api/subjects/${grade.subjectId}`
-              );
-              const subject = await subjectRes.json();
-              return {
-                ...grade,
-                subjectName: subject.subjectName,
-              };
-            } catch {
-              return {
-                ...grade,
-                subjectName: "Unknown Subject",
-              };
-            }
-          })
-        );
-
         setGrades(gradesWithSubjects);
 
         // Calculate average score
         if (gradesWithSubjects.length > 0) {
           const avg =
-            gradesWithSubjects.reduce((sum, g) => sum + g.averageScore, 0) /
+            gradesWithSubjects.reduce((sum: number, g: GradeDetail) => sum + g.averageScore, 0) /
             gradesWithSubjects.length;
           setAverageScore(avg);
         }

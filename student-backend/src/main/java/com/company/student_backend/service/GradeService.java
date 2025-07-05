@@ -7,8 +7,6 @@ import com.company.student_backend.model.Grade;
 import com.company.student_backend.model.Student;
 import com.company.student_backend.model.Subject;
 import com.company.student_backend.repository.GradeRepository;
-import com.company.student_backend.repository.StudentRepository;
-import com.company.student_backend.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,8 +23,7 @@ import java.util.stream.Collectors;
 public class GradeService {
 
     private final GradeRepository gradeRepository;
-    private final StudentRepository studentRepository;
-    private final SubjectRepository subjectRepository;
+    private final ValidationService validationService;
 
     public List<GradeDTO> getAllGrades() {
         log.debug("Fetching all grades");
@@ -45,13 +42,9 @@ public class GradeService {
     public GradeDTO createGrade(GradeDTO gradeDTO) {
         log.debug("Creating new grade: {}", gradeDTO);
 
-        // Check if student exists
-        Student student = studentRepository.findById(gradeDTO.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy học sinh với mã: " + gradeDTO.getStudentId()));
-
-        // Check if subject exists
-        Subject subject = subjectRepository.findById(gradeDTO.getSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy môn học với mã: " + gradeDTO.getSubjectId()));
+        // Validate student and subject exist using ValidationService
+        Student student = validationService.validateAndGetStudent(gradeDTO.getStudentId());
+        Subject subject = validationService.validateAndGetSubject(gradeDTO.getSubjectId());
 
         // Check if grade already exists for this student-subject combination
         if (gradeRepository.existsByStudentStudentIdAndSubjectSubjectId(gradeDTO.getStudentId(), gradeDTO.getSubjectId())) {

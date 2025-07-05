@@ -1,43 +1,58 @@
 /// Utility functions for validation
 class Validators {
-  /// Validate student ID
-  static String? validateStudentId(String? value) {
+  // Common patterns
+  static final _alphanumericPattern = RegExp(r'^[A-Za-z0-9]+$');
+
+  /// Generic validator for ID fields (student ID, subject ID)
+  static String? _validateId(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
-      return 'Mã sinh viên không được để trống';
+      return '$fieldName không được để trống';
     }
 
-    if (value.trim().length < 3) {
-      return 'Mã sinh viên phải có ít nhất 3 ký tự';
+    final trimmed = value.trim();
+    
+    if (trimmed.length < 3) {
+      return '$fieldName phải có ít nhất 3 ký tự';
     }
 
-    if (value.trim().length > 10) {
-      return 'Mã sinh viên không được quá 10 ký tự';
+    if (trimmed.length > 10) {
+      return '$fieldName không được quá 10 ký tự';
     }
 
-    // Basic pattern check (letters and numbers only)
-    final pattern = RegExp(r'^[A-Za-z0-9]+$');
-    if (!pattern.hasMatch(value.trim())) {
-      return 'Mã sinh viên chỉ được chứa chữ cái và số';
+    if (!_alphanumericPattern.hasMatch(trimmed)) {
+      return '$fieldName chỉ được chứa chữ cái và số';
     }
 
     return null;
   }
 
-  /// Validate student name
-  static String? validateStudentName(String? value) {
+  /// Generic validator for name fields
+  static String? _validateName(String? value, String fieldName, {int minLength = 2, int maxLength = 100}) {
     if (value == null || value.trim().isEmpty) {
-      return 'Tên sinh viên không được để trống';
+      return '$fieldName không được để trống';
     }
 
-    if (value.trim().length < 2) {
-      return 'Tên sinh viên phải có ít nhất 2 ký tự';
+    final trimmed = value.trim();
+    
+    if (trimmed.length < minLength) {
+      return '$fieldName phải có ít nhất $minLength ký tự';
     }
 
-    if (value.trim().length > 100) {
-      return 'Tên sinh viên không được quá 100 ký tự';
+    if (trimmed.length > maxLength) {
+      return '$fieldName không được quá $maxLength ký tự';
     }
 
     return null;
+  }
+
+  /// Validate student ID
+  static String? validateStudentId(String? value) {
+    return _validateId(value, 'Mã sinh viên');
+  }
+
+  /// Validate student name
+  static String? validateStudentName(String? value) {
+    return _validateName(value, 'Tên sinh viên');
   }
 
   /// Validate birth year
@@ -61,42 +76,12 @@ class Validators {
 
   /// Validate subject ID
   static String? validateSubjectId(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Mã môn học không được để trống';
-    }
-
-    if (value.trim().length < 3) {
-      return 'Mã môn học phải có ít nhất 3 ký tự';
-    }
-
-    if (value.trim().length > 10) {
-      return 'Mã môn học không được quá 10 ký tự';
-    }
-
-    // Basic pattern check (letters and numbers only)
-    final pattern = RegExp(r'^[A-Za-z0-9]+$');
-    if (!pattern.hasMatch(value.trim())) {
-      return 'Mã môn học chỉ được chứa chữ cái và số';
-    }
-
-    return null;
+    return _validateId(value, 'Mã môn học');
   }
 
   /// Validate subject name
   static String? validateSubjectName(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Tên môn học không được để trống';
-    }
-
-    if (value.trim().length < 2) {
-      return 'Tên môn học phải có ít nhất 2 ký tự';
-    }
-
-    if (value.trim().length > 100) {
-      return 'Tên môn học không được quá 100 ký tự';
-    }
-
-    return null;
+    return _validateName(value, 'Tên môn học');
   }
 
   /// Validate grade score
