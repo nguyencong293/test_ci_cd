@@ -4,18 +4,16 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GradeDTO {
-
-    private Long id;
+public class GradeRequestDTO {
 
     @NotBlank(message = "Mã học sinh không được để trống")
     private String studentId;
@@ -27,8 +25,4 @@ public class GradeDTO {
     @DecimalMin(value = "0.0", message = "Điểm không được nhỏ hơn 0")
     @DecimalMax(value = "10.0", message = "Điểm không được lớn hơn 10")
     private BigDecimal averageScore;
-
-    // For response with names
-    private String studentName;
-    private String subjectName;
 }

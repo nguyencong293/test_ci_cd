@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO {
-
-    @NotBlank(message = "Mã học sinh không được để trống")
-    private String studentId;
+public class StudentRequestDTO {
 
     @NotBlank(message = "Tên học sinh không được để trống")
     private String studentName;
