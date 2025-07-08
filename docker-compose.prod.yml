@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: 
-      context: ./student-backend
-      dockerfile: Dockerfile
+    image: student-backend:latest
     ports:
       - "8080:8080"
     environment:
@@ -12,17 +10,26 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: student_manager
-      DB_USERNAME: root
-      DB_PASSWORD: baby
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-baby}
       JPA_DDL_AUTO: validate
       SERVER_PORT: 8080
       LOG_LEVEL: INFO
+      HEALTH_SHOW_DETAILS: never
     depends_on:
       db:
         condition: service_healthy
     networks:
       - student-net
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -31,17 +38,23 @@ services:
       start_period: 40s
 
   frontend:
-    build: 
-      context: ./student-frontend
-      dockerfile: Dockerfile
+    image: student-frontend:latest
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - student-net
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
       interval: 30s
@@ -53,17 +66,23 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: student_manager
-      MYSQL_ROOT_PASSWORD: baby
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-baby}
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=512M
-    ports:
-      - "3306:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=1G --max-connections=200
     volumes:
       - db_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - student-net
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s

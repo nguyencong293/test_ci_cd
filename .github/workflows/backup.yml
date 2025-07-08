@@ -1,0 +1,70 @@
+name: Database Backup
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Create backup
+      run: |
+        # Create backup directory with timestamp
+        BACKUP_DIR="backup-$(date +%Y%m%d-%H%M%S)"
+        mkdir -p $BACKUP_DIR
+        
+        # Get database container info
+        DB_CONTAINER=$(docker ps --filter "name=student-manager-db" --format "{{.ID}}")
+        
+        if [ ! -z "$DB_CONTAINER" ]; then
+          # Create database dump
+          docker exec $DB_CONTAINER mysqldump \
+            -u root \
+            -p${{ secrets.DB_PASSWORD }} \
+            --single-transaction \
+            --routines \
+            --triggers \
+            student_manager > $BACKUP_DIR/student_manager_backup.sql
+          
+          # Compress backup
+          tar -czf $BACKUP_DIR.tar.gz $BACKUP_DIR
+          
+          echo "Backup created: $BACKUP_DIR.tar.gz"
+          ls -lh $BACKUP_DIR.tar.gz
+        else
+          echo "Database container not found"
+          exit 1
+        fi
+
+    - name: Upload backup to cloud storage
+      uses: google-github-actions/upload-cloud-storage@v2
+      with:
+        path: backup-*.tar.gz
+        destination: ${{ secrets.BACKUP_BUCKET }}
+        credentials: ${{ secrets.GCP_CREDENTIALS }}
+      if: env.BACKUP_BUCKET != ''
+
+    - name: Cleanup old local backups
+      run: |
+        # Keep only last 7 days of backups locally
+        find . -name "backup-*.tar.gz" -type f -mtime +7 -delete
+
+    - name: Notify backup status
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#operations'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: "Database backup completed with status: ${{ job.status }}"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
