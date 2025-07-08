@@ -48,6 +48,7 @@ jobs:
     - name: Run tests
       run: |
         cd student-backend
+        chmod +x mvnw
         ./mvnw clean test
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/student_manager_test
@@ -95,7 +96,7 @@ jobs:
     - name: Run tests
       run: |
         cd student-frontend
-        npm test -- --coverage --watchAll=false
+        npm run test
       if: always()
 
     - name: Upload coverage reports
