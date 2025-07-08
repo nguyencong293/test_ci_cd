@@ -1,25 +1,45 @@
-# Student Manager - Complete CI/CD Setup
+# Student Manager System 🎓
 
-🚀 **Complete student management system with automated CI/CD pipeline**
+**Hệ thống quản lý sinh viên hoàn chỉnh với CI/CD Pipeline**
 
-## 📋 QUY TRÌNH VẬN HÀNH NHANH
+## ✅ Trạng thái hiện tại: **READY TO USE**
 
-### 🎯 **1. Setup Repository (Lần đầu)**
+### 🚀 **Quick Start - Chạy ngay bây giờ:**
 
 ```bash
-# Clone hoặc tạo repository mới
-git clone https://github.com/YOUR_USERNAME/student-manager.git
+# 1. Clone repository
+git clone https://github.com/nguyencong293/test_ci_cd.git
 cd student-manager
 
-# Configure repository settings
-chmod +x scripts/configure-repo.sh
-./scripts/configure-repo.sh
+# 2. Chạy toàn bộ hệ thống
+docker-compose up -d
 
-# Push to GitHub
-git add .
-git commit -m "feat: complete CI/CD setup"
-git push origin main
+# 3. Truy cập ứng dụng
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8080/api/students
+# Health Check: http://localhost:8080/actuator/health
 ```
+
+### 🏗️ **Tech Stack:**
+
+**Frontend:**
+- ⚛️ React 18 + TypeScript
+- ⚡ Vite (Build tool)
+- 🎨 Tailwind CSS
+- 🐳 Docker + Nginx
+
+**Backend:**
+- ☕ Spring Boot 3.x
+- 🗃️ Spring Data JPA
+- 🔒 Spring Security
+- 📊 MySQL 8.0
+- 🐳 Docker
+
+**DevOps:**
+- 🚀 GitHub Actions CI/CD
+- 🐳 Docker Compose
+- 📊 Health Checks
+- 🔧 Automated Testing
 
 ### 🔐 **2. GitHub Secrets Configuration**
 
