@@ -1,23 +1,22 @@
 # Multi-stage Dockerfile for Spring Boot Backend
 FROM eclipse-temurin:17-jdk-alpine as builder
 
-# Install required packages
-RUN apk add --no-cache curl
+# Install Maven
+RUN apk add --no-cache maven
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml first for better caching
-COPY mvnw mvnw.cmd pom.xml ./
-COPY .mvn .mvn
+# Copy pom.xml first for better caching
+COPY pom.xml ./
 
 # Download dependencies (this layer will be cached)
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B
 
 # Production stage
 FROM eclipse-temurin:17-jre-alpine
