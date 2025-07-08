@@ -2,17 +2,17 @@ version: '3.8'
 
 services:
   backend:
-    image: student-backend:latest
+    image: ghcr.io/nguyencong293/test_ci_cd/student-backend:latest
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: student_manager
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-baby}
-      JPA_DDL_AUTO: validate
+      JPA_DDL_AUTO: update
       SERVER_PORT: 8080
       LOG_LEVEL: INFO
       HEALTH_SHOW_DETAILS: never
@@ -38,7 +38,7 @@ services:
       start_period: 40s
 
   frontend:
-    image: student-frontend:latest
+    image: ghcr.io/nguyencong293/test_ci_cd/student-frontend:latest
     ports:
       - "80:80"
     depends_on:
