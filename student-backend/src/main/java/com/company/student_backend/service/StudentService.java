@@ -91,8 +91,7 @@ public class StudentService {
         return new StudentDTO(
                 student.getStudentId(),
                 student.getStudentName(),
-                student.getBirthYear()
-        );
+                student.getBirthYear());
     }
 
     private Student convertToEntity(StudentDTO studentDTO) {
@@ -100,7 +99,6 @@ public class StudentService {
                 studentDTO.getStudentId(),
                 studentDTO.getStudentName(),
                 studentDTO.getBirthYear(),
-                null
-        );
+                null);
     }
 }
