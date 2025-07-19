@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'config/app_theme.dart';
-import 'views/screens/home_screen.dart';
-import 'views/screens/students_screen.dart';
-import 'views/screens/subjects_screen.dart';
-import 'views/screens/grades_screen.dart';
+import 'routes/app_router.dart';
 
 void main() {
+  AppRouter.initialize();
   runApp(const StudentManagerApp());
 }
 
@@ -14,18 +12,12 @@ class StudentManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Student Manager',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeScreen(),
-        '/students': (context) => const StudentsScreen(),
-        '/subjects': (context) => const SubjectsScreen(),
-        '/grades': (context) => const GradesScreen(),
-      },
+      routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
     );
   }

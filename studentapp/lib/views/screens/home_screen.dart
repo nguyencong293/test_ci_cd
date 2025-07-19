@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/app_config.dart';
+import '../../routes/app_router.dart';
 
 /// Home screen with navigation options
 class HomeScreen extends StatelessWidget {
@@ -42,21 +44,21 @@ class HomeScreen extends StatelessWidget {
                     'Sinh viên',
                     Icons.people,
                     Colors.blue,
-                    () => Navigator.pushNamed(context, '/students'),
+                    () => context.go(AppRouter.students),
                   ),
                   _buildNavigationCard(
                     context,
                     'Môn học',
                     Icons.book,
                     Colors.green,
-                    () => Navigator.pushNamed(context, '/subjects'),
+                    () => context.go(AppRouter.subjects),
                   ),
                   _buildNavigationCard(
                     context,
                     'Điểm số',
                     Icons.grade,
                     Colors.orange,
-                    () => Navigator.pushNamed(context, '/grades'),
+                    () => context.go(AppRouter.grades),
                   ),
                   _buildNavigationCard(
                     context,
