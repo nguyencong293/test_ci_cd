@@ -16,156 +16,237 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      title: 'Quản lý sinh viên',
-      description:
-          'Dễ dàng quản lý thông tin sinh viên, thêm mới, chỉnh sửa và theo dõi dữ liệu.',
-      image: Icons.school,
+      title: 'Khám phá thế giới trong tầm tay bạn',
+      description: 'Dễ dàng quản lý thông tin sinh viên, thêm mới, chỉnh sửa và theo dõi dữ liệu một cách hiệu quả.',
+      backgroundImage: 'assets/images/onboarding1.png',
       color: Colors.blue,
     ),
     OnboardingPage(
-      title: 'Quản lý môn học',
-      description:
-          'Tổ chức và quản lý các môn học một cách hiệu quả và khoa học.',
-      image: Icons.book,
+      title: 'Đặt tour dễ dàng, trải nghiệm trọn vẹn',
+      description: 'Tổ chức và quản lý các môn học một cách hiệu quả và khoa học với công nghệ hiện đại.',
+      backgroundImage: 'assets/images/onboarding2.png',
       color: Colors.green,
     ),
     OnboardingPage(
-      title: 'Quản lý điểm số',
-      description:
-          'Theo dõi và quản lý điểm số của sinh viên một cách chính xác và chi tiết.',
-      image: Icons.grade,
+      title: 'Cùng chúng tôi lưu giữ từng khoảnh khắc trên mọi cung đường',
+      description: 'Theo dõi và quản lý điểm số của sinh viên một cách chính xác và chi tiết.',
+      backgroundImage: 'assets/images/onboarding3.png',
       color: Colors.orange,
+    ),
+    OnboardingPage(
+      title: 'Chào mừng bạn đến với TripFinity',
+      description: 'Khám phá những điểm đến tuyệt vời và tạo ra những kỷ niệm đáng nhớ cùng chúng tôi.',
+      backgroundImage: 'assets/images/onboarding4.png',
+      color: Colors.teal,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Skip button
-            Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.all(16),
-              child: TextButton(
-                onPressed: _completeOnboarding,
-                child: const Text('Bỏ qua'),
-              ),
-            ),
+      body: Stack(
+        children: [
+          // Page view
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemCount: _pages.length,
+            itemBuilder: (context, index) {
+              return _buildPage(_pages[index]);
+            },
+          ),
 
-            // Page view
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemCount: _pages.length,
-                itemBuilder: (context, index) {
-                  return _buildPage(_pages[index]);
-                },
+          // Skip button (top right)
+          Positioned(
+            top: 50,
+            right: 20,
+            child: TextButton(
+              onPressed: _completeOnboarding,
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.2),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-            ),
-
-            // Page indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _pages.length,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _currentPage == index
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey[300],
-                  ),
+              child: const Text(
+                'Bỏ qua',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
+          ),
 
-            // Navigation buttons
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Bottom navigation area
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.3),
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Previous button
-                  if (_currentPage > 0)
-                    TextButton(
-                      onPressed: () {
-                        _pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: const Text('Quay lại'),
-                    )
-                  else
-                    const SizedBox(width: 80),
+                  // Page indicator
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentPage == index ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: _currentPage == index
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.4),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
 
-                  // Next/Complete button
-                  ElevatedButton(
-                    onPressed: _currentPage == _pages.length - 1
-                        ? _completeOnboarding
-                        : () {
-                            _pageController.nextPage(
+                  // Navigation buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Previous button
+                      if (_currentPage > 0)
+                        TextButton(
+                          onPressed: () {
+                            _pageController.previousPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                           },
-                    child: Text(
-                      _currentPage == _pages.length - 1
-                          ? 'Bắt đầu'
-                          : 'Tiếp theo',
-                    ),
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.2),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                            ),
+                          ),
+                          child: const Text(
+                            'Quay lại',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      else
+                        const SizedBox(width: 100),
+
+                      // Next/Complete button
+                      ElevatedButton(
+                        onPressed: _currentPage == _pages.length - 1
+                            ? _completeOnboarding
+                            : () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _currentPage == _pages.length - 1 
+                              ? Colors.green 
+                              : Colors.blue,
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          _currentPage == _pages.length - 1
+                              ? 'Đồng nhập'
+                              : 'Tiếp theo',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildPage(OnboardingPage page) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: page.color.withOpacity(0.1),
-            ),
-            child: Icon(page.image, size: 80, color: page.color),
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(page.backgroundImage),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.3),
+              Colors.black.withOpacity(0.7),
+            ],
           ),
-          const SizedBox(height: 48),
-          Text(
-            page.title,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                page.title,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                page.description,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 80),
+            ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            page.description,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -189,13 +270,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class OnboardingPage {
   final String title;
   final String description;
-  final IconData image;
+  final String backgroundImage;
   final Color color;
 
   OnboardingPage({
     required this.title,
     required this.description,
-    required this.image,
+    required this.backgroundImage,
     required this.color,
   });
 }
